@@ -1,16 +1,16 @@
 from itertools import permutations
 from random import sample, shuffle
 
-N = 10 #amount of members
-GROUPS = (5, 5) #quantities of members per group
-PERMUTATIONS_RANGE = 100000
+N = 10 # amount of members
+GROUPS = (5, 5) # quantities of members in each group
+PERMUTATIONS_RANGE = 100000 # number of shuffled permutations in which the best block searched
 
 PARTS = list('0123456789abdefghijklmnopqrstuvwxyz')[:N]
 COUNT_GR = len(GROUPS)
 
-разница
+
 def rep_list():
-    #return spreadsheet of repeating meetings
+    # return spreadsheet of repeating meetings
     reps = [[0] * N for _ in range(N)]
     for block in blocks:
         for line in block:
@@ -24,7 +24,7 @@ def rep_list():
 
 
 def delta_reps():
-    #return difference between max and min number of repeating meetings
+    # return difference between max and min number of repeating meetings
     reps  = rep_list()
     min_rep = min([min(line) for line in reps])
     max_rep = max([max(line) for line in reps])
@@ -33,7 +33,7 @@ def delta_reps():
 
 
 def print_reps_table():
-    #print spreadsheet of repeating meetings
+    # print spreadsheet of repeating meetings
     reps  = rep_list()
     print(('   ' + '{:>3}' * N).format(*PARTS))
     for i in range(N):
@@ -54,29 +54,34 @@ def main():
     blocks = []
     rand_box = PARTS[:]
     if COUNT_GR == 3:
-        blocks.append([rand_box[:GROUPS[0]], rand_box[GROUPS[0]:-GROUPS[2]], rand_box[-GROUPS[2]:]])
+        new_block = [rand_box[:GROUPS[0]], rand_box[GROUPS[0]:-GROUPS[2]], rand_box[-GROUPS[2]:]]
     else:
-        blocks.append([rand_box[:GROUPS[0]], rand_box[GROUPS[0]:]])
+        new_block = [rand_box[:GROUPS[0]], rand_box[GROUPS[0]:]]
+    blocks.append(new_block)
     for i in range(7):
         min_delta = 100
         for _ in range(PERMUTATIONS_RANGE):
             shuffle(rand_box)
             if COUNT_GR == 3:
-                blocks.append([rand_box[:GROUPS[0]], rand_box[GROUPS[0]:-GROUPS[2]], rand_box[-GROUPS[2]:]])
+                new_block = [rand_box[:GROUPS[0]], rand_box[GROUPS[0]:-GROUPS[2]], rand_box[-GROUPS[2]:]]
             else:
-                blocks.append([rand_box[:GROUPS[0]], rand_box[GROUPS[0]:]])
+                new_block = [rand_box[:GROUPS[0]], rand_box[GROUPS[0]:]]
+            blocks.append(new_block)
             cur_delta = delta_reps()
             if cur_delta < min_delta:
                 best_box = rand_box[:]
                 min_delta = cur_delta
             blocks.pop()
         if COUNT_GR == 3:
-            blocks.append([best_box[:GROUPS[0]], best_box[GROUPS[0]:-GROUPS[2]], best_box[-GROUPS[2]:]])
+            new_block = [best_box[:GROUPS[0]], best_box[GROUPS[0]:-GROUPS[2]], best_box[-GROUPS[2]:]]
         else:
-            blocks.append([best_box[:GROUPS[0]], best_box[GROUPS[0]:]])
-    for block in blocks:
+            new_block = [best_box[:GROUPS[0]], best_box[GROUPS[0]:]]
+        blocks.append(new_block)
+    for i, block in enumerate(blocks):
+        print('Permutation # {}:'.format(i))
         for line in block:
-            [print(elem, end='') for elem in line]
+            for elem in line:
+                print(elem, end='')
             print()
         print()
     print_reps_table()
